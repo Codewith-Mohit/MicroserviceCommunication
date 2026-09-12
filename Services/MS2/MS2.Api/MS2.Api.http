@@ -1,0 +1,6 @@
+@MS2.Api_HostAddress = http://localhost:5012
+
+GET {{MS2.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

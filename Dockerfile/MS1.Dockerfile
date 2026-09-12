@@ -1,0 +1,16 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY ["Shared/Shared.Contracts/Shared.Contracts.csproj", "Shared/Shared.Contracts/"]
+COPY ["Services/MS1/MS1.Api/MS1.Api.csproj", "Services/MS1/MS1.Api/"]
+RUN dotnet restore "Services/MS1/MS1.Api/MS1.Api.csproj"
+
+COPY . .
+WORKDIR "/src/Services/MS1/MS1.Api"
+RUN dotnet build "MS1.Api.csproj" -c Release -o /app/build
+RUN dotnet publish "MS1.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "MS1.Api.dll"]

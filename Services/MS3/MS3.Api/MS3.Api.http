@@ -1,0 +1,6 @@
+@MS3.Api_HostAddress = http://localhost:5250
+
+GET {{MS3.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

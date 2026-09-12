@@ -1,0 +1,123 @@
+# Visual Studio
+.vs/
+.vscode/
+bin/
+obj/
+*.user
+*.userprefs
+*.sln.user
+*.suo
+*.sln.iml
+.idea/
+*.swp
+*.swo
+*~
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.log
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# Visual Studio cache/options
+.vs/
+
+# Rider
+.idea/
+*.sln.iml
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+.env
+.env.local
+.env.*.local
+
+# Kubernetes
+k8s/*.yaml
+k8s/*.yml
+kubeconfig
+kubeconfig.*
+!k8s/base/**
+!k8s/overlays/**
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# Database files
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# npm/node (if applicable)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (if applicable)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+
+# Rider
+.idea/
+*.sln.iml
+
+# Certificates and secrets
+*.pfx
+*.pem
+*.key
+*.crt
+*.cert
+secrets/
+*.secret
+appsettings.secrets.json
+
+# Local configuration
+appsettings.Local.json
+appsettings.Development.Local.json
+
+# Build and publish
+PublishProfiles/
+Properties/PublishProfiles/

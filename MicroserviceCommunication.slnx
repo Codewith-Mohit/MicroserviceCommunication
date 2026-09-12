@@ -1,0 +1,27 @@
+<Solution>
+  <Folder Name="/Dockerfile/">
+    <File Path="Dockerfile/MS1.Dockerfile" />
+    <File Path="Dockerfile/MS2.Dockerfile" />
+    <File Path="Dockerfile/MS3.Dockerfile" />
+    <File Path="Dockerfile/UI.Dockerfile" />
+  </Folder>
+  <Folder Name="/Services/" />
+  <Folder Name="/Services/MS1/">
+    <Project Path="Services/MS1/MS1.Api/MS1.Api.csproj" />
+  </Folder>
+  <Folder Name="/Services/MS2/">
+    <Project Path="Services/MS2/MS2.Api/MS2.Api.csproj" />
+  </Folder>
+  <Folder Name="/Services/MS3/">
+    <Project Path="Services/MS3/MS3.Api/MS3.Api.csproj" />
+  </Folder>
+  <Folder Name="/Shared/">
+    <Project Path="Shared/Shared.Contracts/Shared.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/UI/">
+    <Project Path="UI/MicroserviceCommunication.UI/MicroserviceCommunication.UI.csproj" />
+  </Folder>
+</Solution>

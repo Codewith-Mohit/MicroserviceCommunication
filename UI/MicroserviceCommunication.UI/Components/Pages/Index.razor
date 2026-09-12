@@ -1,0 +1,118 @@
+﻿@page "/"
+@inject IHttpClientFactory HttpClientFactory
+@inject IConfiguration Configuration
+@rendermode RenderMode.InteractiveServer
+
+<PageTitle>Microservice Communication Demo</PageTitle>
+
+<div class="container mt-4" style="max-width: 700px;">
+    <h2>Microservice Communication Demo</h2>
+    <hr />
+
+    <div class="mb-3">
+        <label class="form-label font-weight-bold">Sender:</label>
+        <select class="form-select" @bind="sender">
+            <option value="MS1">MS1</option>
+            <option value="MS2">MS2</option>
+            <option value="MS3">MS3</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label font-weight-bold">Receiver:</label>
+        <select class="form-select" @bind="receiver">
+            <option value="MS1">MS1</option>
+            <option value="MS2">MS2</option>
+            <option value="MS3">MS3</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label font-weight-bold">Message:</label>
+        <input type="text" class="form-control" @bind="message" />
+    </div>
+
+    <button class="btn btn-primary w-100" @onclick="SendMessage" disabled="@isProcessing">
+        @(isProcessing ? "Sending..." : "Send Message")
+    </button>
+
+    @if (result != null)
+    {
+        <hr />
+        <h4>Communication Result</h4>
+        <div class="card p-3 bg-light">
+            <p><strong>Status:</strong> <span class="badge @(result.Status == "Success" ? "bg-success" : "bg-warning")">@result.Status</span></p>
+            <p><strong>Sender:</strong> @result.Sender</p>
+            <p><strong>Receiver:</strong> @result.Receiver</p>
+            <p><strong>Original Message:</strong> @result.OriginalMessage</p>
+            <p><strong>Response:</strong> @result.Response</p>
+            <p><small class="text-muted">Correlation ID: @result.CorrelationId</small></p>
+        </div>
+    }
+</div>
+
+@code {
+    private string sender = "MS1";
+    private string receiver = "MS3";
+    private string message = "Hello from microservice!";
+    private bool isProcessing = false;
+    private SendResult? result = null;
+
+    private async Task SendMessage()
+    {
+        if (sender == receiver)
+        {
+            result = new SendResult { Status = "Error", Response = "Sender and Receiver must be different services." };
+            return;
+        }
+
+        isProcessing = true;
+        result = null;
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient();
+
+            // Resolve base URL from configuration or fallback to service name in Docker network
+            string hostUrl = Configuration[$"Services:{sender}"] ?? $"http://{sender.ToLower()}:8080";
+
+            var requestPayload = new { Receiver = receiver, Message = message };
+            var response = await client.PostAsJsonAsync($"{hostUrl}/api/messages/send", requestPayload);
+
+            if (response.IsSuccessStatusCode)
+            {
+                result = await response.Content.ReadFromJsonAsync<SendResult>();
+            }
+            else
+            {
+                result = new SendResult
+                {
+                    Status = "HTTP Error",
+                    Response = $"Service returned status code {response.StatusCode}"
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            result = new SendResult
+            {
+                Status = "Exception",
+                Response = ex.Message
+            };
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    public class SendResult
+    {
+        public string Status { get; set; } = string.Empty;
+        public string Sender { get; set; } = string.Empty;
+        public string Receiver { get; set; } = string.Empty;
+        public string OriginalMessage { get; set; } = string.Empty;
+        public string Response { get; set; } = string.Empty;
+        public string CorrelationId { get; set; } = string.Empty;
+    }
+}
