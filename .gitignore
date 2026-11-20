@@ -48,6 +48,7 @@ docker-compose.override.yml
 .env
 .env.local
 .env.*.local
+.env.credentials.txt
 
 # Kubernetes
 k8s/*.yaml
@@ -56,6 +57,8 @@ kubeconfig
 kubeconfig.*
 !k8s/base/**
 !k8s/overlays/**
+kubernetes/docs/
+Kubernetes/Docs/**
 
 # Environment files
 .env

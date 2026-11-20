@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sqlserver-deployment
+  namespace: microservices-communication
+  labels:
+    app: sqlserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sqlserver
+  template:
+    metadata:
+      labels:
+        app: sqlserver
+    spec:
+      containers:
+      - name: sqlserver
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+        - containerPort: 1433
+          name: sql
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sqlserver-secret
+              key: sa-password
+        - name: MSSQL_PID
+          value: "Express"
+        - name: MSSQL_DATA_DIR
+          value: "/var/opt/mssql/data"
+        - name: MSSQL_LOG_DIR
+          value: "/var/opt/mssql/log"
+        volumeMounts:
+        - name: sqlserver-data
+          mountPath: /var/opt/mssql/data
+        - name: sqlserver-log
+          mountPath: /var/opt/mssql/log
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -Q "SELECT 1" 2>/dev/null || true
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+      volumes:
+      - name: sqlserver-data
+        emptyDir: {}
+      - name: sqlserver-log
+        emptyDir: {}

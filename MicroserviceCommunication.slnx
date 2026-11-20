@@ -24,4 +24,5 @@
   <Folder Name="/UI/">
     <Project Path="UI/MicroserviceCommunication.UI/MicroserviceCommunication.UI.csproj" />
   </Folder>
+  <Project Path="kubernetes/Kubernetes.csproj" />
 </Solution>

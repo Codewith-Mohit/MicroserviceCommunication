@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config
+  namespace: microservices-communication
+data:
+  rabbitmq.conf: |
+    load_definitions = /etc/rabbitmq/definitions.json
+
+  definitions.json: |
+    {
+      "users": [
+        {
+          "name": "myapp",
+          "password": "myapp123",
+          "tags": "administrator"
+        }
+      ],
+      "vhosts": [
+        {
+          "name": "/"
+        }
+      ],
+      "permissions": [
+        {
+          "user": "myapp",
+          "vhost": "/",
+          "configure": ".*",
+          "write": ".*",
+          "read": ".*"
+        }
+      ]
+    }

@@ -1,0 +1,7 @@
+FROM rabbitmq:3-management
+
+# Copy the init script into the image
+COPY --chmod=755 docker/rabbitmq-init.sh /usr/local/bin/rabbitmq-init.sh
+
+# Let RabbitMQ start normally, then our init script handles user creation
+CMD ["sh", "-c", "docker-entrypoint.sh rabbitmq-server & sleep 30 && /usr/local/bin/rabbitmq-init.sh ; wait"]
