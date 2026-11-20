@@ -1,77 +1,127 @@
 services:
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq-automated:latest
     container_name: rabbitmq
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
     environment:
-       RABBITMQ_DEFAULT_USER: guest
-       RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-admin123}
+      RABBITMQ_USER: ${RABBITMQ_USER:-appuser}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-appuser123}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
     ports:
-      - "1433:1433"
+      - "1434:1433"
     environment:
-       SA_PASSWORD: "Your_password123"
-       ACCEPT_EULA: "Y"
+      SA_PASSWORD: ${SA_PASSWORD:-YourSecurePassword123!@#}
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD:-YourSecurePassword123!@#}' -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
-  ms1:
-    build:
-      context: .
-      dockerfile: Dockerfile/MS1.Dockerfile
-    container_name: ms1
-    ports:
-      - "5001:8080"
-    environment:
-      ConnectionStrings__DefaultConnection: "Server=sqlserver;User Id=sa;Password=Your_password123;TrustServerCertificate=True;"
-      RabbitMQ__Host: "rabbitmq"
-    depends_on:
-      - rabbitmq
-      - sqlserver
+  # ms1:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile/MS1.Dockerfile
+  #   container_name: ms1
+  #   ports:
+  #     - "5001:8080"
+  #   environment:
+  #     ASPNETCORE_URLS: "http://+:8080"
+  #     ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=MS1Db;User Id=sa;Password=Your_password123;TrustServerCertificate=True;Encrypt=False;"
+  #     RabbitMQ__Host: "rabbitmq"
+  #     RabbitMQ__HostName: "rabbitmq"
+  #     RabbitMQ__Port: "5672"
+  #     RabbitMQ__UserName: "guest"
+  #     RabbitMQ__Password: "guest"
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #     sqlserver:
+  #       condition: service_healthy
 
-  ms2:
-    build:
-      context: .
-      dockerfile: Dockerfile/MS2.Dockerfile
-    container_name: ms2
-    ports:
-      - "5002:8080"
-    environment:
-      ConnectionStrings__DefaultConnection: "Server=sqlserver;User Id=sa;Password=Your_password123;TrustServerCertificate=True;"
-      RabbitMQ__Host: "rabbitmq"
-    depends_on:
-      - rabbitmq
-      - sqlserver
+  # ms2:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile/MS2.Dockerfile
+  #   container_name: ms2
+  #   ports:
+  #     - "5002:8080"
+  #   environment:
+  #     ASPNETCORE_URLS: "http://+:8080"
+  #     ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=MS2Db;User Id=sa;Password=Your_password123;TrustServerCertificate=True;Encrypt=False;"
+  #     RabbitMQ__Host: "rabbitmq"
+  #     RabbitMQ__HostName: "rabbitmq"
+  #     RabbitMQ__Port: "5672"
+  #     RabbitMQ__UserName: "guest"
+  #     RabbitMQ__Password: "guest"
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #     sqlserver:
+  #       condition: service_healthy
 
-  ms3:
-    build:
-      context: .
-      dockerfile: Dockerfile/MS3.Dockerfile
-    container_name: ms3
-    ports:
-      - "5003:8080"
-    environment:
-      ConnectionStrings__DefaultConnection: "Server=sqlserver;User Id=sa;Password=Your_password123;TrustServerCertificate=True;"
-      RabbitMQ__Host: "rabbitmq"
-    depends_on:
-      - rabbitmq
-      - sqlserver
+  # ms3:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile/MS3.Dockerfile
+  #   container_name: ms3
+  #   ports:
+  #     - "5003:8080"
+  #   environment:
+  #     ASPNETCORE_URLS: "http://+:8080"
+  #     ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=MS3Db;User Id=sa;Password=Your_password123;TrustServerCertificate=True;Encrypt=False;"
+  #     RabbitMQ__Host: "rabbitmq"
+  #     RabbitMQ__HostName: "rabbitmq"
+  #     RabbitMQ__Port: "5672"
+  #     RabbitMQ__UserName: "guest"
+  #     RabbitMQ__Password: "guest"
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #     sqlserver:
+  #       condition: service_healthy
 
-  ui:
-    build:
-      context: .
-      dockerfile: Dockerfile/UI.Dockerfile
-    container_name: ui
-    ports:
-      - "5000:8080"
-    environment:
-      Services__MS1: "http://ms1:8080"
-      Services__MS2: "http://ms2:8080"
-      Services__MS3: "http://ms3:8080"
-    depends_on:
-      - ms1
-      - ms2
-      - ms3
+  # ui:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile/UI.Dockerfile
+  #   container_name: ui
+  #   ports:
+  #     - "5000:8080"
+  #   environment:
+  #     ASPNETCORE_URLS: "http://+:8080"
+  #     Services__MS1: "http://ms1:8080"
+  #     Services__MS2: "http://ms2:8080"
+  #     Services__MS3: "http://ms3:8080"
+  #   depends_on:
+  #     - ms1
+  #     - ms2
+  #     - ms3
+
+volumes:
+  rabbitmq_data:
+    driver: local
+  sqlserver_data:
+    driver: local

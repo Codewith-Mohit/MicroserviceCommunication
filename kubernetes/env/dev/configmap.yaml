@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: microservices-communication
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ASPNETCORE_URLS: "http://+:80"
+  RabbitMQ__Host: "rabbitmq-service"
+  RabbitMQ__HostName: "rabbitmq-service"
+  RabbitMQ__Port: "5672"
+  Services__BESvc1: "http://besvc1-service:8080"
+  Services__BESvc2: "http://besvc2-service:8080"
+  Services__BESvc3: "http://besvc3-service:8080"
